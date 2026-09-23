@@ -22,7 +22,12 @@ export async function migrationFiles(directory = migrationDirectory) {
         `Invalid migration sequence at ${name}; expected ${String(expected).padStart(4, "0")}`,
       );
     }
-    const sql = await readFile(path.join(directory, name), "utf8");
+    // Windows checkouts may turn LF into CRLF. Execute and hash the same
+    // canonical text so a checkout conversion cannot invalidate the ledger.
+    const sql = (await readFile(path.join(directory, name), "utf8")).replace(
+      /\r\n/g,
+      "\n",
+    );
     if (!sql.trim()) throw new Error(`Empty migration: ${name}`);
     migrations.push({
       name,

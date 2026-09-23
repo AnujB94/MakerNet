@@ -42,4 +42,13 @@ describe("migration integrity", () => {
     expect(migration.name).toBe("0001_first.sql");
     expect(migration.checksum).toHaveLength(64);
   });
+
+  it("keeps the checksum stable across Windows line endings", async () => {
+    const lf = await fixture({ "0001_first.sql": "SELECT 1;\n" });
+    const crlf = await fixture({ "0001_first.sql": "SELECT 1;\r\n" });
+    const [unixMigration] = await migrationFiles(lf);
+    const [windowsMigration] = await migrationFiles(crlf);
+    expect(windowsMigration.checksum).toBe(unixMigration.checksum);
+    expect(windowsMigration.sql).toBe(unixMigration.sql);
+  });
 });

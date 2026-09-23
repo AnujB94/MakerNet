@@ -6,11 +6,17 @@ test("foundation page and health endpoint render", async ({
 }, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "One place for campus making.",
+    "A shared workshop starts with a clear place to work.",
   );
-  await expect(page.getByRole("status")).toHaveText(
-    "Application status: running",
-  );
+  await expect(
+    page.getByRole("navigation", { name: "Primary navigation" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Skip to content" }),
+  ).toHaveAttribute("href", "#main-content");
+  await expect(
+    page.getByRole("link", { name: "Explore the design system" }),
+  ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath("foundation.png"),
     fullPage: true,
