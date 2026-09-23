@@ -1,0 +1,12 @@
+{
+  "name": "@makernet/worker",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.2"
+  }
+}

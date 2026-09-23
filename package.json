@@ -1,0 +1,37 @@
+{
+  "name": "makernet",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "packageManager": "npm@11.16.0",
+  "engines": {
+    "node": ">=24.18.0 <25",
+    "npm": ">=11.16.0 <12"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @makernet/web",
+    "build": "npm run build -w @makernet/web",
+    "start": "npm run start -w @makernet/web",
+    "lint": "npm run lint -w @makernet/web && npm run lint -w @makernet/worker && npm run lint -w @makernet/db && node --check scripts/run-e2e.mjs && node --check scripts/prepare-standalone.mjs",
+    "typecheck": "npm run typecheck -w @makernet/web && npm run typecheck -w @makernet/worker",
+    "test": "vitest run",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "db:check": "npm run check -w @makernet/db",
+    "db:migrate": "npm run migrate -w @makernet/db",
+    "db:verify": "npm run verify -w @makernet/db",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run db:check && npm run build",
+    "audit:deps": "npm audit --audit-level=high"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "prettier": "3.9.9",
+    "typescript": "5.9.3",
+    "vitest": "5.0.1"
+  }
+}

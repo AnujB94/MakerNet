@@ -1,0 +1,26 @@
+name: Subsystem task
+description: Contract, implementation, or verification task for the current subsystem
+title: "[Subsystem] "
+labels: ["subsystem"]
+body:
+  - type: input
+    id: subsystem
+    attributes:
+      label: Subsystem
+      placeholder: "0 Repository and Delivery Foundation"
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome and acceptance criteria
+    validations:
+      required: true
+  - type: textarea
+    id: boundary
+    attributes:
+      label: Data, API, permission, and privacy boundary
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification evidence

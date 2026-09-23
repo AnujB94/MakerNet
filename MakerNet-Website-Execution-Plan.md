@@ -4,6 +4,18 @@
 **Delivery rule:** Complete, verify, integrate, and tag one subsystem before starting the next.  
 **Target:** v0 MVP internal alpha followed by a controlled campus pilot.
 
+## Execution Status as of September 24 2026
+
+**Current subsystem:** 0 Repository and Delivery Foundation, in verification. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation is on `feat/foundation-setup`. No later subsystem has started, and `v0.1.0` has not been tagged.
+
+**Implemented:** npm workspace with pinned Node and package versions; blank Next.js application; startup environment validation; structured logging and correlation IDs; liveness and Postgres readiness routes; forward-only migration runner with ordered files and checksums; local Postgres, MinIO, and Mailpit Compose configuration; standalone deployment image; CI workflow; ADRs, runbooks, templates, README, and changelog.
+
+**Local verification:** A clean `npm ci` completed. Formatting, lint, strict TypeScript, seven unit tests, migration-file validation, production build, two Chromium browser tests at desktop and mobile viewports, Compose configuration parsing, and `npm audit --audit-level=high` passed. Browser screenshots were inspected. Startup rejected missing configuration as designed. The architecture and review documents were left unchanged.
+
+**Open completion gates:** Docker Desktop reports that its daemon is unable to start on this machine, so local service startup, an actual Postgres migration, and `/api/ready` against a live database remain unverified. There is no Git remote, the GitHub CLI token is invalid, and no staging host or credentials are configured. The user directed that the deployment gate remain pending. CI execution, branch protection, required reviews, clean-checkout staging deployment, uptime check, merge to `main`, and the annotated `v0.1.0` tag therefore remain pending. Subsystem 1 stays in Backlog under the delivery rule.
+
+**Implementation decisions:** ESLint 9.39.5 is pinned because ESLint 10.11.0 failed with the current Next React lint rule. The production browser runner launches the standalone build on a free local port and stops its own server process, avoiding a Windows teardown stall. The staging image is prepared but has not been run against a host.
+
 ## 1. Execution Model
 
 MakerNet will be built as a sequence of complete vertical subsystems. A subsystem includes its database schema, domain rules, service layer, routes, interface, permissions, tests, operational signals, and documentation. Work on the next subsystem does not begin until the current subsystem passes its completion gate and receives a Git tag.
