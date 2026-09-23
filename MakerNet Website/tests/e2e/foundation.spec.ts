@@ -24,4 +24,11 @@ test("foundation page and health endpoint render", async ({
     service: "makernet-web",
   });
   expect(health.version).toMatch(/^0\.1\.0-/);
+
+  const readinessResponse = await request.get("/api/ready");
+  expect(readinessResponse.ok()).toBe(true);
+  expect(await readinessResponse.json()).toMatchObject({
+    status: "ready",
+    service: "makernet-web",
+  });
 });

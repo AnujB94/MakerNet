@@ -1,4 +1,4 @@
-FROM node:24.18.0-bookworm-slim AS builder
+FROM node:24.18.0-bookworm-slim AS source
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 COPY apps/web/package.json apps/web/package.json
@@ -9,6 +9,8 @@ COPY packages/contracts/package.json packages/contracts/package.json
 COPY packages/config/package.json packages/config/package.json
 RUN npm ci
 COPY . .
+
+FROM source AS builder
 RUN npm run build
 
 FROM node:24.18.0-bookworm-slim

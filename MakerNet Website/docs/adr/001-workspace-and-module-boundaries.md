@@ -16,7 +16,7 @@ The web and worker may deploy as separate processes from the same commit. The in
 
 ## Consequences
 
-One lockfile and release history cover the application. Build and CI run from the repository root. Empty reserved packages are structure, not shipped product features.
+One lockfile and release history cover the application. Build commands run from the `MakerNet Website` folder, while the repository-level GitHub workflow points to that folder. Empty reserved packages are structure, not shipped product features.
 
 ## Verification
 

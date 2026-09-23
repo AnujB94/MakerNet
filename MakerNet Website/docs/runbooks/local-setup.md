@@ -1,7 +1,7 @@
 # Local setup and recovery
 
 1. Install Node 24.18.0, npm 11.16.0, Git, and Docker Desktop with the daemon running.
-2. Run `npm ci` from the repository root.
+2. Enter `MakerNet Website` and run `npm ci` from that folder.
 3. Copy `.env.example` to `apps/web/.env.local`. The sample credentials are for local emulators only.
 4. Start local services with `docker compose -f infra/local/compose.yaml up -d`.
 5. Run `npm run db:check`, `npm run db:migrate`, and `npm run db:verify`.
