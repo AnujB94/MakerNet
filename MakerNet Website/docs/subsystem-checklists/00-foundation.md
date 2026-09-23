@@ -1,8 +1,8 @@
 # Subsystem 0 completion checklist
 
-- **Status:** Verification
+- **Status:** Done
 - **Staging candidate:** `7828a37` on `feat/foundation-setup`
-- **Tag:** Pending
+- **Tag:** `v0.1.0` on the final protected `main` release commit
 
 - [x] Architecture and deployment contract recorded in ADR 001 and ADR 002
 - [x] npm workspace, runtime versions, Next.js app, and migration runner added
@@ -18,7 +18,7 @@
 - [x] Clean checkout deployed to local Docker staging; version, readiness, browser, and uptime checked
 - [x] Foundation PR passes hosted verification and secret scanning
 - [x] Protected `main` requires both CI jobs; the user explicitly set approvals to zero for this release
-- [ ] Latest CI passes, PR merges to `main`, and annotated `v0.1.0` tag is created
+- [x] Latest CI passes, PR merges to `main`, and annotated `v0.1.0` tag is created
 
 ## Verification evidence
 
@@ -35,8 +35,8 @@
 - A fresh clone of `7828a37` built the local Docker staging image. The staging migration exited 0, the database ledger verified one migration, and the web container became healthy. Desktop and mobile browser tests passed against `http://127.0.0.1:3001`; reviewed screenshots are in `docs/screenshots`.
 - Six staging health and readiness probes over 50 seconds returned `0.1.0-rc.1` and commit `7828a37a7a2a9b72b93477a57a395086e3ee735d`. Generated environment files were absent from the build image.
 - The user explicitly authorized publishing the internal documents and website; `https://github.com/AnujB94/MakerNet` is public. [Foundation PR #2](https://github.com/AnujB94/MakerNet/pull/2) passed both hosted CI jobs. [Broken-test PR #3](https://github.com/AnujB94/MakerNet/pull/3) failed at `npm test`; [invalid-migration PR #4](https://github.com/AnujB94/MakerNet/pull/4) failed at `db:migrate`. Both temporary PRs were closed and their branches deleted.
-- `main` protection requires `verify`, `secrets`, current status, linear history, and conversation resolution, including for administrators. The user explicitly authorized setting required approvals to zero while retaining both CI checks. The latest CI run, merge, and tag remain open.
+- `main` protection requires `verify`, `secrets`, current status, linear history, and conversation resolution, including for administrators. The user explicitly authorized setting required approvals to zero while retaining both CI checks. [Foundation PR #2](https://github.com/AnujB94/MakerNet/pull/2) passed the required checks and was squash-merged as `4e31370`. The final release record is on `main` at annotated tag `v0.1.0`.
 
 ## Release boundary
 
-Subsystem 1 starts only after the open foundation gate items pass. The blank web app, `/api/health`, `/api/ready`, and npm workspace are the available interface.
+Subsystem 0 is closed at `v0.1.0`. Subsystem 1 is the next milestone. The blank web app, `/api/health`, `/api/ready`, and npm workspace are the available interface.
