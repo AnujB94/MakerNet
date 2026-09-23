@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: MakerNet Website
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: makernet
+          POSTGRES_USER: makernet
+          POSTGRES_PASSWORD: makernet
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U makernet -d makernet"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      APP_ENV: test
+      DATABASE_URL: postgresql://makernet:makernet@127.0.0.1:5432/makernet
+      OBJECT_STORAGE_ENDPOINT: http://127.0.0.1:9000
+      OBJECT_STORAGE_ACCESS_KEY: ci-placeholder
+      OBJECT_STORAGE_SECRET_KEY: ci-placeholder
+      SMTP_URL: smtp://127.0.0.1:1025
+      APP_VERSION: 0.1.0-ci
+      BUILD_COMMIT: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: MakerNet Website/.nvmrc
+          cache: npm
+          cache-dependency-path: MakerNet Website/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run db:check
+      - run: npm run db:migrate
+      - run: npm run db:verify
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run audit:deps
+
+  secrets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

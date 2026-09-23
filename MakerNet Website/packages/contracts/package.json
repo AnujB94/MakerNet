@@ -1,0 +1,6 @@
+{
+  "name": "@makernet/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shared API contracts begin with the first product module"
+}

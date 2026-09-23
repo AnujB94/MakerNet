@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.*
+!.env.example
+!.env.test.example
+*.local
+*.log
+*.tsbuildinfo
+.eslintcache
+.DS_Store
+.turbo/

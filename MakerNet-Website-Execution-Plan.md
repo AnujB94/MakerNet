@@ -4,6 +4,20 @@
 **Delivery rule:** Complete, verify, integrate, and tag one subsystem before starting the next.  
 **Target:** v0 MVP internal alpha followed by a controlled campus pilot.
 
+## Execution Status as of September 24 2026
+
+**Current subsystem:** 0 Repository and Delivery Foundation, in verification. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation is on `feat/foundation-setup`; `7828a37` is the clean-checkout local staging candidate. No later subsystem has started, and `v0.1.0` has not been tagged.
+
+**Implemented:** The website workspace now lives in `MakerNet Website`, with repository-level GitHub files and the three source documents remaining at the root. The workspace includes pinned Node and package versions; blank Next.js application; startup environment validation; structured logging and correlation IDs; liveness and Postgres readiness routes; forward-only migration runner with ordered files and checksums; local Postgres, MinIO, and Mailpit; a separate local Docker staging stack and standalone image; CI workflow; ADRs, runbooks, templates, README, and changelog. The GitHub repository `AnujB94/MakerNet` is public at the user's request and configured as `origin`.
+
+**Local verification:** A clean `npm ci` completed after the folder move. Formatting, lint, strict TypeScript, seven unit tests, migration-file validation, production build, two Chromium browser tests at desktop and mobile viewports, Compose configuration parsing, and `npm audit --audit-level=high` passed. All three local Docker services became healthy; the foundation SQL migration applied and verified against Postgres, and browser tests confirmed `/api/ready`. Deliberately broken test and SQL migration inputs each produced a failing exit code; the failed SQL transaction rolled back and the original migration still verified. A fresh local clone of `7828a37` built and started a separate staging stack, verified its migration ledger, and passed desktop and mobile browser tests plus six health and readiness probes over 50 seconds with the expected version and commit. Its generated credentials were absent from the image. Browser screenshots were inspected. Startup rejected missing configuration as designed. The architecture and review documents were left unchanged.
+
+**Hosted verification:** With the user's explicit authorization, the architecture documents and website were pushed to `AnujB94/MakerNet`, which was subsequently made public at the user's request. Foundation pull request #2 passed both `verify` and `secrets` jobs. Temporary pull request #3 failed specifically at `npm test` after formatting, lint, and typecheck passed. Temporary pull request #4 failed specifically at `npm run db:migrate` after the earlier checks passed. Both negative pull requests were closed and their remote branches deleted. `main` requires the `verify` and `secrets` checks, current branch status, linear history, and conversation resolution; administrators are included. The user explicitly changed the required approval count from one to zero for this foundation release.
+
+**Open completion gates:** Pull request #2 must pass the latest CI run, merge to protected `main`, and receive the annotated `v0.1.0` tag. Subsystem 1 stays in Backlog until the foundation release is tagged.
+
+**Implementation decisions:** ESLint 9.39.5 is pinned because ESLint 10.11.0 failed with the current Next React lint rule. The production browser runner launches the standalone build on a free local port and stops its own server process, avoiding a Windows teardown stall. The user selected this machine's Docker Desktop as the Subsystem 0 staging host. Staging uses a separate database and generated, ignored credentials; the image is built from the `MakerNet Website` folder of a clean checkout.
+
 ## 1. Execution Model
 
 MakerNet will be built as a sequence of complete vertical subsystems. A subsystem includes its database schema, domain rules, service layer, routes, interface, permissions, tests, operational signals, and documentation. Work on the next subsystem does not begin until the current subsystem passes its completion gate and receives a Git tag.
@@ -76,6 +90,7 @@ Every module owns its schema-facing repository functions, domain services, polic
 - Use Conventional Commit prefixes: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`, and `perf`.
 - Keep schema migrations in the same pull request as the code that first uses them.
 - Require one reviewer for ordinary work and two reviewers for authentication, authorization, public visibility, moderation, media access, and destructive migrations.
+- **Subsystem 0 deviation:** At the user's explicit request, GitHub requires zero approving reviews for this foundation release. The `verify` and `secrets` checks remain mandatory. Revisit the review count before later security-sensitive subsystems.
 - Each pull request must identify its subsystem, linked issue, migration effect, permission effect, tests, screenshots for UI changes, and rollback notes.
 - Squash a noisy implementation branch when merging, while preserving a clear release history.
 

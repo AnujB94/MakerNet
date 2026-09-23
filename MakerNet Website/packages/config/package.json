@@ -1,0 +1,6 @@
+{
+  "name": "@makernet/config",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Shared module configuration is added when the second app consumes it"
+}

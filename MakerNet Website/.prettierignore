@@ -1,0 +1,9 @@
+package-lock.json
+coverage/
+.next/
+playwright-report/
+test-results/
+MakerNet-Product-Architecture.md
+MakerNet-Product-Architecture-Review.md
+MakerNet-Website-Execution-Plan.md
+apps/web/next-env.d.ts
