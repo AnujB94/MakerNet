@@ -6,7 +6,7 @@
 
 ## Execution Status as of September 24 2026
 
-**Current subsystem:** 0 Repository and Delivery Foundation, in verification. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation is on `feat/foundation-setup`; `7828a37` is the clean-checkout local staging candidate. No later subsystem has started, and `v0.1.0` has not been tagged.
+**Completed subsystem:** 0 Repository and Delivery Foundation, released as `v0.1.0`. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation was squash-merged through pull request #2 as `4e31370`; `7828a37` was the clean-checkout local staging candidate. Subsystem 1 is next and has not started.
 
 **Implemented:** The website workspace now lives in `MakerNet Website`, with repository-level GitHub files and the three source documents remaining at the root. The workspace includes pinned Node and package versions; blank Next.js application; startup environment validation; structured logging and correlation IDs; liveness and Postgres readiness routes; forward-only migration runner with ordered files and checksums; local Postgres, MinIO, and Mailpit; a separate local Docker staging stack and standalone image; CI workflow; ADRs, runbooks, templates, README, and changelog. The GitHub repository `AnujB94/MakerNet` is public at the user's request and configured as `origin`.
 
@@ -14,7 +14,7 @@
 
 **Hosted verification:** With the user's explicit authorization, the architecture documents and website were pushed to `AnujB94/MakerNet`, which was subsequently made public at the user's request. Foundation pull request #2 passed both `verify` and `secrets` jobs. Temporary pull request #3 failed specifically at `npm test` after formatting, lint, and typecheck passed. Temporary pull request #4 failed specifically at `npm run db:migrate` after the earlier checks passed. Both negative pull requests were closed and their remote branches deleted. `main` requires the `verify` and `secrets` checks, current branch status, linear history, and conversation resolution; administrators are included. The user explicitly changed the required approval count from one to zero for this foundation release.
 
-**Open completion gates:** Pull request #2 must pass the latest CI run, merge to protected `main`, and receive the annotated `v0.1.0` tag. Subsystem 1 stays in Backlog until the foundation release is tagged.
+**Release closure:** Pull request #2 passed both protected-branch checks and was squash-merged to `main`. The foundation release record is included on `main`, and the annotated `v0.1.0` tag identifies its exact release commit. All Subsystem 0 completion gates are met. Subsystem 1 is the next unstarted milestone.
 
 **Implementation decisions:** ESLint 9.39.5 is pinned because ESLint 10.11.0 failed with the current Next React lint rule. The production browser runner launches the standalone build on a free local port and stops its own server process, avoiding a Windows teardown stall. The user selected this machine's Docker Desktop as the Subsystem 0 staging host. Staging uses a separate database and generated, ignored credentials; the image is built from the `MakerNet Website` folder of a clean checkout.
 
