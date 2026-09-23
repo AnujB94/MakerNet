@@ -29,7 +29,7 @@ test("foundation page and health endpoint render", async ({
     status: "ok",
     service: "makernet-web",
   });
-  expect(health.version).toMatch(/^0\.1\.0-/);
+  expect(health.version).toMatch(/^\d+\.\d+\.\d+/);
 
   const readinessResponse = await request.get("/api/ready");
   expect(readinessResponse.ok()).toBe(true);

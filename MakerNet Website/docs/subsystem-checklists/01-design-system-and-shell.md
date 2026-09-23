@@ -14,8 +14,9 @@
 - [x] Automated accessibility checks and desktop/phone keyboard browser tests pass
 - [x] Production build, unit tests, migration-file check, live database verification, and dependency audit pass
 - [ ] Manual screen-reader smoke test on the visible site
-- [ ] Clean-checkout local Docker staging candidate passes health, readiness, and browser checks
-- [ ] Hosted CI passes; merge and annotate `v0.2.0`
+- [x] Clean-checkout local Docker staging candidate passes health, readiness, and browser checks
+- [x] Hosted CI passes both required jobs on draft pull request #6
+- [ ] Merge and annotate `v0.2.0`
 
 ## Verification
 
@@ -32,6 +33,14 @@
   verified against the existing Postgres ledger after normalizing Windows
   line endings. No schema change was made.
 - `npm run audit:deps`: zero reported vulnerabilities.
+- [Draft pull request #6](https://github.com/AnujB94/MakerNet/pull/6) passed
+  hosted `verify` and `secrets` jobs.
+- Clean clone of `3dc265e` built an isolated Docker staging stack on port
+  3002 as `0.2.0-rc.1`. Its migration ledger verified one migration, all eight
+  desktop and phone browser tests passed, and six health and readiness probe
+  pairs passed over 50 seconds with the expected commit and version. The web
+  image contains no generated environment files. The `v0.1.0` staging stack
+  remained healthy on port 3001.
 
 ## Decisions and deviations
 
