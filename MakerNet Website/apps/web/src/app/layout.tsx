@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { SiteNavigation } from "@/components/site-navigation";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -11,7 +13,31 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <header className="site-header">
+          <div className="container site-header-inner">
+            <Link className="brand" href="/" aria-label="MakerNet home">
+              Maker<span className="brand-mark">Net</span>
+            </Link>
+            <SiteNavigation />
+            <div className="account-location" aria-label="Account area">
+              Visitor
+            </div>
+          </div>
+        </header>
+        <main className="site-main" id="main-content" tabIndex={-1}>
+          {children}
+        </main>
+        <footer className="site-footer">
+          <div className="container site-footer-inner">
+            <span>MakerNet · A place for campus making</span>
+            <span>Built for useful work and shared knowledge</span>
+          </div>
+        </footer>
+      </body>
     </html>
   );
 }
