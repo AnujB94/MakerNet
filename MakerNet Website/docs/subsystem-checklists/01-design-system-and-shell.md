@@ -16,6 +16,8 @@
 - [ ] Manual screen-reader smoke test on the visible site
 - [x] Clean-checkout local Docker staging candidate passes health, readiness, and browser checks
 - [x] Hosted CI passes both required jobs on draft pull request #6
+- [x] Protected Vercel preview builds and serves `/design-system`
+- [ ] Configure and verify Vercel production runtime dependencies
 - [ ] Merge and annotate `v0.2.0`
 
 ## Verification
@@ -41,6 +43,12 @@
   pairs passed over 50 seconds with the expected commit and version. The web
   image contains no generated environment files. The `v0.1.0` staging stack
   remained healthy on port 3001.
+- Vercel project `makernet` preview
+  `https://makernet-1r9di2ms2-anujb0904-7595s-projects.vercel.app` completed
+  its Next.js build and served `/design-system` with HTTP 200 through the
+  authenticated Vercel CLI. Vercel SSO deployment protection is enabled.
+  Dynamic `/` and `/api/health` returned 500 because the required production
+  service environment variables have not been supplied.
 
 ## Decisions and deviations
 
@@ -59,3 +67,7 @@
   unavailable, so an actual screen-reader pass was not possible. Automated
   accessibility and keyboard evidence does not replace that check. This gate
   remains open.
+- Vercel receives only the web app directory, so its build uses
+  `apps/web/vercel.json` and `npx next build`; the workspace's Docker-specific
+  `postbuild` remains for local staging. Web TypeScript excludes co-located
+  Vitest files during that host build while workspace tests still run them.
