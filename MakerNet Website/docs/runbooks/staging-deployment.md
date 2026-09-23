@@ -2,7 +2,7 @@
 
 **Status:** Local Docker staging is the agreed target for Subsystem 0 verification.
 
-The staging host must run the image built from `MakerNet Website/infra/staging/Dockerfile`, using `MakerNet Website` as the build context, with production-like environment variables and a reachable Postgres database. Configuration is injected by the host secret store; no credentials belong in the repository or image.
+The staging host must run the image built from `MakerNet Website/infra/staging/Dockerfile`, using `MakerNet Website` as the build context, with production-like environment variables and a reachable Postgres database. Local Docker staging reads generated credentials from an ignored environment file; no credentials belong in the repository or image.
 
 Deployment order:
 

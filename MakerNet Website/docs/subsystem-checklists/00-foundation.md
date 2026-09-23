@@ -1,7 +1,7 @@
 # Subsystem 0 completion checklist
 
-- **Status:** In progress
-- **Commit:** `59be042` on `feat/foundation-setup`
+- **Status:** Verification
+- **Staging candidate:** `7828a37` on `feat/foundation-setup`
 - **Tag:** Pending
 
 - [x] Architecture and deployment contract recorded in ADR 001 and ADR 002
@@ -12,9 +12,10 @@
 - [x] Clean dependency install and lockfile verified
 - [x] Formatting, lint, typecheck, unit, browser, dependency audit, migration-file validation, and production build checks pass locally
 - [x] Local Compose configuration parses
-- [ ] Docker service startup and empty-database migration verified
-- [ ] CI demonstrated to fail on a broken test and broken migration
-- [ ] Clean checkout deployed to staging; version, readiness, and uptime checked
+- [x] Docker service startup and empty-database migration verified
+- [x] Deliberately broken test and SQL migration rejected locally, with rollback verified
+- [ ] Hosted CI demonstrated to fail on a broken test and broken migration
+- [x] Clean checkout deployed to local Docker staging; version, readiness, browser, and uptime checked
 - [ ] Required reviews, protected `main`, and annotated `v0.1.0` tag completed
 
 ## Verification evidence
@@ -27,8 +28,11 @@
 - `npm run test:e2e`: two production-build Chromium tests passed at desktop and mobile viewports; both screenshots were inspected.
 - `npm run audit:deps`: zero reported vulnerabilities.
 - Missing required startup configuration caused a startup failure, as required.
-- Docker Desktop's daemon reported `unable to start`; live database migration and readiness remain open.
-- GitHub authentication is invalid, and no remote or staging target is configured. The user chose to leave the deployment gate pending.
+- Local Postgres, MinIO, and Mailpit started healthy. `0001_foundation.sql` applied to Postgres; `db:verify` reported one migration and the browser tests confirmed `/api/ready`.
+- A deliberately failing Vitest assertion returned exit code 1. A syntactically invalid `0002` SQL migration returned exit code 1; after removing it, `db:verify` still reported exactly one applied migration.
+- A fresh clone of `7828a37` built the local Docker staging image. The staging migration exited 0, the database ledger verified one migration, and the web container became healthy. Desktop and mobile browser tests passed against `http://127.0.0.1:3001`.
+- Six staging health and readiness probes over 50 seconds returned `0.1.0-rc.1` and commit `7828a37a7a2a9b72b93477a57a395086e3ee735d`. Generated environment files were absent from the build image.
+- Private repository `https://github.com/AnujB94/MakerNet` was created and connected as `origin`. Automatic approval review rejected pushing the internal source documents to it without explicit user authorization for that payload and destination. Hosted CI, reviews, protection, merge, and tag remain open.
 
 ## Release boundary
 

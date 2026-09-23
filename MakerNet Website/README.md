@@ -37,6 +37,10 @@ npm.cmd run test:e2e
 
 The browser command starts the production standalone build on a free port. Run `npm.cmd run build` first. It loads `apps/web/.env.local` for local verification or uses environment variables supplied by CI.
 
+## Local staging
+
+From a clean checkout, run `npm.cmd run staging:env`, then `docker compose --env-file infra/staging/.env.staging.local -f infra/staging/compose.yaml up -d --build --wait`. Run `npm.cmd run staging:verify` to check version, commit, health, and readiness six times over 50 seconds. Staging listens on `http://127.0.0.1:3001`; see the [deployment runbook](docs/runbooks/staging-deployment.md).
+
 ## Module ownership
 
 `apps/web` serves pages and routes. `apps/worker` is reserved for durable background jobs. `packages/db` owns migrations. UI, contracts, and shared configuration packages are reserved for the first subsystems that need them. Product modules must enforce their own service policies; pages compose them through typed boundaries.
