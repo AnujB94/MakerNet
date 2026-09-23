@@ -1,0 +1,373 @@
+# MakerNet Website Execution Plan
+
+**Source:** MakerNet Product Architecture  
+**Delivery rule:** Complete, verify, integrate, and tag one subsystem before starting the next.  
+**Target:** v0 MVP internal alpha followed by a controlled campus pilot.
+
+## 1. Execution Model
+
+MakerNet will be built as a sequence of complete vertical subsystems. A subsystem includes its database schema, domain rules, service layer, routes, interface, permissions, tests, operational signals, and documentation. Work on the next subsystem does not begin until the current subsystem passes its completion gate and receives a Git tag.
+
+Each subsystem follows the same eight-step cycle:
+
+1. **Define the contract.** Write the user stories, permissions, data ownership, API inputs and outputs, error cases, and acceptance criteria. Record material technical decisions in an Architecture Decision Record.
+2. **Design the data.** Add forward-only migrations, constraints, seed data, and rollback or recovery notes.
+3. **Implement domain rules.** Keep business logic inside the subsystem module rather than page components or route handlers.
+4. **Expose the service boundary.** Add typed service functions and REST endpoints where a browser, worker, or future client needs them.
+5. **Build the interface.** Implement desktop and mobile layouts plus loading, empty, error, success, disabled, hover, active, and keyboard-focus states.
+6. **Verify in isolation.** Run unit, database integration, permission, accessibility, and browser tests for the subsystem.
+7. **Connect completed subsystems.** Integrate only with already tagged subsystems. Add contract and end-to-end tests for every new connection.
+8. **Close and tag.** Update documentation and the changelog, deploy to staging, complete acceptance testing, merge to `main`, and create the subsystem release tag.
+
+If a completion gate fails, the subsystem remains active. Bugs discovered in an earlier subsystem receive a patch release before current work continues.
+
+## 2. Recommended Repository Structure
+
+Use one repository and one modular codebase. The web process and worker may deploy separately, but they share domain modules, database models, validation schemas, and release history.
+
+```text
+makernet/
+  apps/
+    web/                  Next.js website and server routes
+    worker/               Search, media, email, and outbox jobs
+  packages/
+    db/                   Schema, migrations, seeds, and test helpers
+    ui/                   Design tokens and reusable interface components
+    config/               Shared TypeScript, lint, test, and environment config
+    contracts/            Shared schemas and typed API contracts
+  modules/
+    identity/
+    skills/
+    profiles/
+    guides/
+    media/
+    search/
+    contact/
+    moderation/
+  tests/
+    e2e/
+    authorization/
+    fixtures/
+  docs/
+    adr/
+    runbooks/
+    subsystem-checklists/
+  infra/
+    local/
+    staging/
+  .github/
+    workflows/
+    pull_request_template.md
+```
+
+Every module owns its schema-facing repository functions, domain services, policies, background handlers, interface components, and tests. Cross-module database writes go through public module services. Pages may compose module interfaces but do not bypass their policies.
+
+## 3. Version Control and Release Discipline
+
+### Branches
+
+- Protect `main`; it must always build, migrate, and pass the complete automated suite.
+- Use short-lived branches named `feat/<subsystem>-<issue>`, `fix/<subsystem>-<issue>`, or `chore/<area>-<issue>`.
+- Keep only one subsystem epic in active development. Small branches may divide that subsystem, but they merge through reviewed pull requests before its release gate.
+- Do not maintain long-running integration or development branches. Staging deploys from `main` or from the exact release candidate commit.
+
+### Commits and pull requests
+
+- Use Conventional Commit prefixes: `feat`, `fix`, `test`, `docs`, `refactor`, `chore`, and `perf`.
+- Keep schema migrations in the same pull request as the code that first uses them.
+- Require one reviewer for ordinary work and two reviewers for authentication, authorization, public visibility, moderation, media access, and destructive migrations.
+- Each pull request must identify its subsystem, linked issue, migration effect, permission effect, tests, screenshots for UI changes, and rollback notes.
+- Squash a noisy implementation branch when merging, while preserving a clear release history.
+
+### Tags and versions
+
+Until the campus pilot is stable, each completed subsystem increments the minor version:
+
+| Tag | Completion milestone |
+| --- | --- |
+| `v0.1.0` | Repository and delivery foundation |
+| `v0.2.0` | Design system and application shell |
+| `v0.3.0` | Identity and access control |
+| `v0.4.0` | Skill taxonomy |
+| `v0.5.0` | Profiles and self-declared skills |
+| `v0.6.0` | Guide publishing, attribution, and guide-backed evidence |
+| `v0.7.0` | Media pipeline |
+| `v0.8.0` | Unified search and discovery |
+| `v0.9.0` | Contact requests and notifications |
+| `v0.10.0` | Moderation, safety review, and public visibility |
+| `v0.11.0-alpha.1` | Internal alpha candidate |
+| `v0.11.0-beta.1` | Controlled-pilot candidate |
+| `v0.11.0` | Accepted v0 MVP |
+
+Use patch releases for corrections to a completed subsystem. Use annotated tags and generate a changelog from merged pull requests. Production and staging deployments must record the exact tag, commit, migration set, and configuration version.
+
+### Migration safety
+
+- Use forward-only migrations in normal development.
+- Apply expand, migrate, contract for destructive schema changes across separate releases.
+- Never combine a destructive column removal with the first code change that stops using it.
+- Back up staging or production data before a risky migration and rehearse restoration.
+- Seed data must be deterministic and must never grant privileged roles outside a test environment.
+
+## 4. Interface Direction
+
+Use an **industrial editorial** direction: practical, calm, and precise, like a well-maintained workshop notebook. Pages should favor readable lists, strong headings, useful metadata, and direct actions over dashboard decoration.
+
+- Use warm neutral surfaces, charcoal text, and one primary cobalt accent. Reserve amber, red, and green for warning, error, and success states.
+- Use an 8-pixel spacing system, a restrained type scale, and no more than two self-hosted font families.
+- Give each screen one primary action. Use cards only for distinct entities such as a guide, person, equipment item, or help request.
+- Keep body copy between 65 and 75 characters per line. Use clear left alignment for text-heavy pages.
+- Support keyboard use end to end, visible focus rings, 44-by-44-pixel touch targets, sufficient contrast, reduced motion, and semantic headings.
+- Treat mobile screens as task-focused layouts. Replace wide tables with labeled rows, summaries, or drill-down views.
+- Motion is limited to feedback and state transitions, normally under 300 milliseconds and restricted to opacity, transform, and filter.
+
+The first design-system release must document tokens and components in a component workbench or dedicated development route. New visual patterns cannot be introduced inside later subsystem pages without first becoming an approved reusable component or documented exception.
+
+## 5. Subsystem Sequence
+
+### Subsystem 0 Repository and Delivery Foundation
+
+**Purpose:** Create a reliable development environment before product code exists.
+
+1. Initialize Git and add the protected `main` workflow.
+2. Create the workspace structure and pin runtime and package-manager versions.
+3. Configure strict TypeScript, formatting, linting, unit tests, browser tests, and dependency checks.
+4. Add local services for Postgres, object-storage emulation, and captured email.
+5. Create environment validation. The application must fail at startup when required configuration is missing.
+6. Add continuous integration for install, lint, typecheck, tests, production build, migration validation, and secret scanning.
+7. Create staging deployment, preview deployment, structured logging, health endpoints, and basic uptime monitoring.
+8. Add pull-request, issue, ADR, runbook, and subsystem completion templates.
+
+**Completion gate:** A blank application deploys from a clean checkout; CI blocks a deliberately broken test and migration; local setup works from the README; staging reports version and health; no secrets are committed.
+
+**Release:** `v0.1.0`
+
+### Subsystem 1 Design System and Application Shell
+
+**Purpose:** Finish the visual and interaction foundation before feature screens multiply.
+
+1. Approve the industrial editorial direction with desktop and mobile examples.
+2. Define color, spacing, typography, radius, elevation, motion, breakpoint, and focus tokens.
+3. Build buttons, links, inputs, selects, text areas, checkboxes, dialogs, menus, tabs, status labels, alerts, skeletons, empty states, and form errors.
+4. Build the responsive site shell: header, primary navigation, account menu location, content width, footer, and skip link.
+5. Create page templates for list, detail, editor, settings, and moderation views.
+6. Document every component state and keyboard behavior.
+7. Run automated accessibility checks and manual keyboard and screen-reader smoke tests.
+
+**Completion gate:** All base components render every required state on phone and desktop widths; contrast and touch targets pass; keyboard navigation reaches every control; no feature-specific data or unfinished placeholder screen remains.
+
+**Integration:** Connect the shell only to foundation health and version information.
+
+**Release:** `v0.2.0`
+
+### Subsystem 2 Identity and Access Control
+
+**Purpose:** Establish trustworthy accounts and one reusable authorization boundary.
+
+1. Implement a local development identity provider and the college OpenID Connect or SAML adapter behind one interface.
+2. Store identity by issuer and provider subject; add account states for active, suspended, departed, and deleted.
+3. Implement session creation, rotation, revocation, expiry, logout, and secure cookie behavior.
+4. Add organization membership and scoped roles for member, organization officer, moderator, staff reviewer, and administrator.
+5. Implement the central policy service for public, college-only, organization-only, and private access.
+6. Build sign-in, callback, access-denied, session-expired, account-state, and basic account settings screens.
+7. Add audit events for sign-in, role changes, session revocation, and account lifecycle actions.
+8. Create a complete authorization test matrix, including anonymous, ordinary member, organization member, officer, moderator, and administrator cases.
+
+**Completion gate:** No route or service relies only on hidden interface controls for authorization; role and audience tests pass at the service and browser layers; suspended and departed accounts lose access and privileged roles immediately; audit events are queryable.
+
+**Integration:** Replace the anonymous shell placeholder with the authenticated account menu and policy-aware navigation.
+
+**Release:** `v0.3.0`
+
+### Subsystem 3 Skill Taxonomy
+
+**Purpose:** Create the canonical vocabulary used by profiles, guides, and search.
+
+1. Implement `Skill` and `SkillAlias` with parent relationships, normalization, uniqueness constraints, and cycle prevention.
+2. Seed the first 25 supported skills and reviewed aliases.
+3. Build moderator services for create, rename, move, alias, deactivate, and merge-preview operations.
+4. Build the skill picker and taxonomy browser with keyboard support and clear parent context.
+5. Add public or authorized skill-detail routes containing only taxonomy data at this stage.
+6. Test normalization, ambiguous aliases, inactive skills, cycles, and permission failures.
+
+**Completion gate:** Every seeded term resolves deterministically to one active canonical skill; invalid cycles and duplicate aliases are rejected; only authorized moderators can mutate taxonomy data; picker performance and accessibility pass with the complete seed set.
+
+**Integration:** Connect the taxonomy picker to the shell's development form and expose the read-only skill route.
+
+**Release:** `v0.4.0`
+
+### Subsystem 4 Profiles and Self-Declared Skills
+
+**Purpose:** Deliver member profiles with explicit field-level privacy.
+
+1. Implement profile fields, audience type, organization scope, self-declared skill claims, and the rebuildable skill projection.
+2. Define the fixed public and college profile projections. Effective access uses the most restrictive applicable rule.
+3. Build profile view, edit, privacy, and willingness-to-help screens.
+4. Add self-declared skills through the completed taxonomy picker.
+5. Build profile completion, empty, private-field, departed-member, and pseudonymous states.
+6. Add services for correction, deactivation, export preparation, and search-projection rebuild, while leaving search delivery disabled.
+7. Test field-level authorization across every audience and organization membership combination.
+
+**Completion gate:** A member can create and edit a profile, add canonical skills, preview each audience, and verify exactly what anonymous, college, and organization viewers see. Unauthorized fields never appear in server responses, page source, logs, or cached projections.
+
+**Integration:** Connect identity data and the skill taxonomy to profiles. Keep profiles college-only during the internal alpha stage.
+
+**Release:** `v0.5.0`
+
+### Subsystem 5 Guide Publishing Attribution and Evidence
+
+**Purpose:** Complete the core MakerNet loop using text-only guides before adding uploads.
+
+1. Implement guides, maintainers, drafts, immutable revisions, edit proposals, revision skills, draft contributions, evidence candidates, revision attribution, and skill evidence.
+2. Implement maintainer scopes, last-maintainer protection, ownership transfer, optimistic publishing locks, and stale-proposal handling.
+3. Build the text-first guide editor with guide type, goal, prerequisites, bill of materials, steps, lessons, skills, visibility, and risk declaration.
+4. Build collaborator invitation, credit order, role, contribution note, evidence acceptance, maximum audience, and public-byline flows.
+5. Publish in one transaction: create the immutable revision, snapshot accepted attribution, activate accepted evidence, advance revision pointers, and write the outbox event.
+6. Build guide detail, revision history, draft list, proposal review, contributor response, archive, and withdrawal screens.
+7. Rebuild the completed profile skill projection after evidence activation or withdrawal.
+8. Test concurrent publication, pending contributors, rejected evidence, visibility widening, pseudonymous credits, withdrawal, and departed maintainers.
+
+**Completion gate:** A team can draft, invite, accept credit, publish, view revision history, propose an edit, publish a second revision, and see accepted evidence on authorized profiles. Older attribution never changes. Text-only guides remain college-only and exclude hazardous publication at this stage.
+
+**Integration:** Connect identity, authorization, skills, profiles, and the outbox. Add end-to-end tests for the entire guide-to-profile evidence loop.
+
+**Release:** `v0.6.0`
+
+### Subsystem 6 Media Pipeline
+
+**Purpose:** Add safe guide images and attachments without weakening access control.
+
+1. Implement media records and states for requested, uploaded, scanning, clean, rejected, and removed.
+2. Upload directly to a nonservable quarantine location using short-lived credentials.
+3. Validate declared and detected type, size, quota, and malware state.
+4. Copy clean files to immutable served keys, verify the copy, mark them servable in a transaction, and clean quarantine objects asynchronously.
+5. Generate previews in a sandbox and strip metadata where appropriate.
+6. Proxy restricted downloads through current authorization checks; use short-lived signed URLs only for approved public files.
+7. Build upload progress, processing, rejection, retry, removal, caption, and alternative-text interfaces.
+8. Test unauthorized access, URL expiry, visibility changes, quarantine, duplicate worker delivery, corrupt files, and orphan cleanup.
+
+**Completion gate:** No unscanned object is retrievable or previewed; changing guide visibility or quarantine state affects all restricted downloads immediately; retrying any media job is safe; captions and alternative text are usable from the keyboard.
+
+**Integration:** Add media blocks to the completed guide editor and guide renderer. The text-only guide flow must continue to work unchanged.
+
+**Release:** `v0.7.0`
+
+### Subsystem 7 Unified Search and Discovery
+
+**Purpose:** Make authorized profiles and guides discoverable through one search experience.
+
+1. Define search documents and ranking inputs for people, guides, skills, and organizations.
+2. Implement Postgres full-text search, trigram matching, aliases, taxonomy expansion, pagination, and deterministic tie-breaking.
+3. Build audience-specific indexing from outbox events and a complete idempotent rebuild command.
+4. Apply authorization before ranking and prevent restricted evidence from entering public documents.
+5. Build the combined search page, result-type filters, evidence labels, skill pages, empty results, spelling suggestions, and keyboard navigation.
+6. Record privacy-safe success, result-click, contact-intent, and zero-result events.
+7. Create relevance fixtures and the 40 representative pilot tasks.
+8. Test stale-index removal after withdrawal, quarantine, visibility change, departure, and evidence revocation.
+
+**Completion gate:** The authorization matrix passes for pages, APIs, and indexes; all 40 benchmark tasks have reviewed expected results; a full reindex produces the same visible dataset as incremental indexing; restricted data never appears in public snippets or counts.
+
+**Integration:** Connect profile, guide, skill, and organization projections. Do not add equipment results until the v1 equipment subsystem exists.
+
+**Release:** `v0.8.0`
+
+### Subsystem 8 Contact Requests and Notifications
+
+**Purpose:** Let members safely contact willing helpers and receive reliable system events.
+
+1. Implement contact-request states for pending, accepted, declined, expired, blocked, and cancelled.
+2. Add willingness-to-help checks, recipient blocks, rate limits, abuse reporting, expiry, and message-length controls.
+3. Implement outbox consumption, in-app notifications, email alerts, retry, dead-letter handling, and uniqueness by event, recipient, channel, and type.
+4. Build the contact composer, confirmation, inbox, request detail, notification preferences, block list, and delivery-status views.
+5. Keep email content minimal; links return to an authorized in-app view.
+6. Test duplicate events, visibility changes after delivery, expired sessions, blocking races, muted channels, and inaccessible targets.
+
+**Completion gate:** A willing member receives one in-app notification and at most one email per request, can accept or decline, and can block the sender. Duplicate workers do not duplicate delivery. Unauthorized or withdrawn profile evidence is not disclosed in notifications.
+
+**Integration:** Add the contact action to completed profile and search views. Measure request creation, delivery, response, decline, block, and expiry.
+
+**Release:** `v0.9.0`
+
+### Subsystem 9 Moderation Safety Review and Public Visibility
+
+**Purpose:** Finish the trust controls required before anonymous browsing or hazardous publication.
+
+1. Implement reports, moderation cases, safety states, review ownership, actions, appeals, deadlines, and audit events.
+2. Check structured risk declarations plus guide title, steps, bill of materials, skills, and attachment metadata during publication.
+3. Implement under-review warnings, quarantine, removal, restoration, publication disablement, and explicit safe fallback to a prior revision.
+4. Build the moderation queue, case view, evidence history, action form, overdue view, and emergency controls.
+5. Add public profile and guide visibility only after renewed contributor audience consent.
+6. Extend the effective-visible-revision resolver to search, direct links, notifications, evidence, APIs, and media.
+7. Add abuse scenarios, authorization tests, audit verification, and an incident drill.
+
+**Completion gate:** A moderator can trace and reverse permitted actions; quarantined content disappears from every ordinary read path; prior-revision fallback requires explicit approval; overdue cases escalate after one business day; public views expose only consented data. The complete public-access and hazardous-guide gates must pass before either feature flag is enabled.
+
+**Integration:** Connect moderation to guides, media, profiles, search, notifications, and auditing. Enable public browsing and hazardous publication separately in staging before the controlled pilot.
+
+**Release:** `v0.10.0`
+
+### Subsystem 10 Operations and Pilot Release
+
+**Purpose:** Prove that the connected system can be operated, recovered, and evaluated.
+
+1. Finalize dashboards for errors, latency, job backlog, failed notifications, media scans, search indexing, moderation deadlines, and storage use.
+2. Set backup and recovery objectives; run and document a full restore rehearsal.
+3. Complete data export, deactivation, deletion, pseudonymization, and retention jobs.
+4. Run dependency, configuration, upload, authorization, and privacy reviews.
+5. Load-test search, guide publication, media processing, and notification bursts with representative pilot volume.
+6. Seed at least 25 canonical skills with three useful guides or two willing helpers per skill.
+7. Run the 40-task search study. At least 32 tasks must reach a defined useful result within 30 seconds, and the supported-skill zero-result rate must stay below 10 percent.
+8. Complete support, moderation, incident, rollback, data correction, and account departure runbooks.
+9. Release to internal alpha, fix defects with patch tags, then release a controlled-pilot candidate.
+
+**Completion gate:** Restore, incident, quarantine, rollback, and account-departure drills pass; no open critical or high-severity issue remains; accessibility and authorization matrices pass; pilot metrics meet the architecture criteria; operators sign off on the runbooks.
+
+**Releases:** `v0.11.0-alpha.1`, `v0.11.0-beta.1`, then `v0.11.0`
+
+## 6. Definition of Done for Every Subsystem
+
+A subsystem is complete only when all applicable items are true:
+
+- User stories and non-goals are documented.
+- Database migrations and constraints have been exercised from an empty database and from the preceding tag.
+- Domain rules are tested independently of the interface.
+- Authorization is enforced in service code and covered by negative tests.
+- UI includes desktop and mobile layouts plus loading, empty, error, success, disabled, focus, and keyboard states.
+- Accessibility checks and manual keyboard testing pass.
+- Integration and browser tests cover every connection to earlier subsystems.
+- Background jobs are idempotent and observable.
+- Logs exclude private content and include correlation identifiers.
+- Metrics, alerts, recovery notes, and operator actions are documented.
+- Staging acceptance passes with production-like configuration.
+- The subsystem checklist, ADRs, API notes, screenshots, and changelog are current.
+- No critical or high-severity defect remains open.
+- `main` is green and the annotated release tag has been created.
+
+## 7. Work Board and Handoff Rules
+
+Use one epic per subsystem. Each epic contains contract, schema, domain, API, UI, permissions, tests, documentation, staging, and release issues. The board has five states: **Backlog**, **Current subsystem**, **Verification**, **Release ready**, and **Done**.
+
+Only one epic can occupy **Current subsystem**. An issue from a later subsystem may be clarified in Backlog, but implementation does not start. When a dependency is discovered, add it to the current subsystem or revise the boundary through an ADR; do not leave a hidden placeholder for later.
+
+At the release handoff, record:
+
+1. The tag and commit.
+2. Migrations and configuration changes.
+3. New permissions and privacy effects.
+4. User-visible routes and workflows.
+5. Test and accessibility results.
+6. Known low-severity limitations.
+7. Monitoring and rollback instructions.
+8. The explicit interfaces the next subsystem may use.
+
+## 8. First Actions
+
+Execute these actions in order:
+
+1. Approve this sequence and the v0 boundaries.
+2. Initialize the repository and create the `v0.1.0` foundation epic.
+3. Write ADR 001 for the workspace structure and modular-monolith boundary.
+4. Write ADR 002 for the identity provider interface and authorization policy service.
+5. Configure CI and staging before creating product modules.
+6. Complete and tag Subsystem 0.
+7. Begin Subsystem 1 only after the foundation completion gate passes.
