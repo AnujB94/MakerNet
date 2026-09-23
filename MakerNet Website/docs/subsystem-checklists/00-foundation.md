@@ -14,9 +14,11 @@
 - [x] Local Compose configuration parses
 - [x] Docker service startup and empty-database migration verified
 - [x] Deliberately broken test and SQL migration rejected locally, with rollback verified
-- [ ] Hosted CI demonstrated to fail on a broken test and broken migration
+- [x] Hosted CI demonstrated to fail on a broken test and broken migration
 - [x] Clean checkout deployed to local Docker staging; version, readiness, browser, and uptime checked
-- [ ] Required reviews, protected `main`, and annotated `v0.1.0` tag completed
+- [x] Foundation PR passes hosted verification and secret scanning
+- [x] Protected `main` requires both CI jobs and one independent approving review
+- [ ] Independent review, merge to `main`, and annotated `v0.1.0` tag completed
 
 ## Verification evidence
 
@@ -32,7 +34,8 @@
 - A deliberately failing Vitest assertion returned exit code 1. A syntactically invalid `0002` SQL migration returned exit code 1; after removing it, `db:verify` still reported exactly one applied migration.
 - A fresh clone of `7828a37` built the local Docker staging image. The staging migration exited 0, the database ledger verified one migration, and the web container became healthy. Desktop and mobile browser tests passed against `http://127.0.0.1:3001`; reviewed screenshots are in `docs/screenshots`.
 - Six staging health and readiness probes over 50 seconds returned `0.1.0-rc.1` and commit `7828a37a7a2a9b72b93477a57a395086e3ee735d`. Generated environment files were absent from the build image.
-- Private repository `https://github.com/AnujB94/MakerNet` was created and connected as `origin`. Automatic approval review rejected pushing the internal source documents to it without explicit user authorization for that payload and destination. Hosted CI, reviews, protection, merge, and tag remain open.
+- The user explicitly authorized pushing the internal documents and website to private `https://github.com/AnujB94/MakerNet`. [Foundation PR #2](https://github.com/AnujB94/MakerNet/pull/2) passed both hosted CI jobs. [Broken-test PR #3](https://github.com/AnujB94/MakerNet/pull/3) failed at `npm test`; [invalid-migration PR #4](https://github.com/AnujB94/MakerNet/pull/4) failed at `db:migrate`. Both temporary PRs were closed and their branches deleted.
+- `main` protection requires `verify`, `secrets`, one independent approving review, current status, linear history, and conversation resolution, including for administrators. Review, merge, and tag remain open.
 
 ## Release boundary
 
