@@ -6,7 +6,7 @@
 
 ## Execution Status as of September 24 2026
 
-**Current subsystem:** 0 Repository and Delivery Foundation, in verification. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation is on `feat/foundation-setup`. No later subsystem has started, and `v0.1.0` has not been tagged.
+**Current subsystem:** 0 Repository and Delivery Foundation, in verification. The original architecture, review log, and this plan were committed as baseline `40135ad` on `main`. Foundation implementation is committed as `59be042` on `feat/foundation-setup`. No later subsystem has started, and `v0.1.0` has not been tagged.
 
 **Implemented:** npm workspace with pinned Node and package versions; blank Next.js application; startup environment validation; structured logging and correlation IDs; liveness and Postgres readiness routes; forward-only migration runner with ordered files and checksums; local Postgres, MinIO, and Mailpit Compose configuration; standalone deployment image; CI workflow; ADRs, runbooks, templates, README, and changelog.
 

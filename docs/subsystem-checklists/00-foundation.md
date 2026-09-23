@@ -1,7 +1,8 @@
 # Subsystem 0 completion checklist
 
 - **Status:** In progress
-- **Tag and commit:** Pending
+- **Commit:** `59be042` on `feat/foundation-setup`
+- **Tag:** Pending
 
 - [x] Architecture and deployment contract recorded in ADR 001 and ADR 002
 - [x] npm workspace, runtime versions, Next.js app, and migration runner added
