@@ -1,6 +1,6 @@
 # MakerNet
 
-MakerNet connects campus makers, skills, and practical guides. This folder contains the website workspace. The repository follows [the website execution plan](../MakerNet-Website-Execution-Plan.md). Subsystems 0 and 1 are tagged. Subsystems 2–5 have local implementations pending college SSO, production database integration, and release acceptance.
+MakerNet connects campus makers, skills, and practical guides. This folder contains the website workspace. The repository follows [the website execution plan](../MakerNet-Website-Execution-Plan.md). Subsystems 0 and 1 are tagged. Subsystems 2–5 have local implementations pending production database and email integration, deployment, and release acceptance.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ npm.cmd run db:verify
 npm.cmd run dev
 ```
 
-Open `http://127.0.0.1:3000`. Local sign-in is available only from loopback in `APP_ENV=local` or `test`. `/api/health` reports liveness, version, and commit; `/api/ready` checks Postgres. Local object storage is at `http://127.0.0.1:9001` and captured email is at `http://127.0.0.1:8025`.
+Open `http://127.0.0.1:3000`. Any syntactically valid email can request a passwordless sign-in link; local messages are captured at `http://127.0.0.1:8025`. The development-account shortcut is available only from loopback in `APP_ENV=local` or `test`. `/api/health` reports liveness, version, and commit; `/api/ready` checks Postgres. Local object storage is at `http://127.0.0.1:9001` for the later media subsystem.
 
 ## Verification
 

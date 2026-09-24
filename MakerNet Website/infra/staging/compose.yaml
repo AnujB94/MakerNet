@@ -51,6 +51,7 @@ services:
       OBJECT_STORAGE_ACCESS_KEY: ${STAGING_STORAGE_USER:?Run npm run staging:env first}
       OBJECT_STORAGE_SECRET_KEY: ${STAGING_STORAGE_PASSWORD:?Run npm run staging:env first}
       SMTP_URL: smtp://mail:1025
+      EMAIL_FROM: MakerNet <noreply@makernet.local>
       APP_VERSION: ${APP_VERSION:?Run npm run staging:env first}
       BUILD_COMMIT: ${BUILD_COMMIT:?Run npm run staging:env first}
       PORT: "3000"

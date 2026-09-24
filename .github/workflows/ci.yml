@@ -25,6 +25,11 @@ jobs:
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
+      mail:
+        image: axllent/mailpit:latest
+        ports:
+          - 1025:1025
+          - 8025:8025
     env:
       APP_ENV: test
       DATABASE_URL: postgresql://makernet:makernet@127.0.0.1:5432/makernet
@@ -32,6 +37,7 @@ jobs:
       OBJECT_STORAGE_ACCESS_KEY: ci-placeholder
       OBJECT_STORAGE_SECRET_KEY: ci-placeholder
       SMTP_URL: smtp://127.0.0.1:1025
+      EMAIL_FROM: MakerNet <noreply@makernet.test>
       APP_VERSION: 0.1.0-ci
       BUILD_COMMIT: ${{ github.sha }}
     steps:

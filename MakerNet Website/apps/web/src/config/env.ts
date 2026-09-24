@@ -3,17 +3,14 @@ export type AppEnvironment = "local" | "test" | "staging" | "production";
 export interface ServerEnvironment {
   appEnv: AppEnvironment;
   databaseUrl: string;
-  objectStorageEndpoint: string;
-  objectStorageAccessKey: string;
-  objectStorageSecretKey: string;
+  objectStorageEndpoint?: string;
+  objectStorageAccessKey?: string;
+  objectStorageSecretKey?: string;
   smtpUrl: string;
+  emailFrom: string;
   appVersion: string;
   buildCommit: string;
   appOrigin?: string;
-  oidcIssuer?: string;
-  oidcClientId?: string;
-  oidcClientSecret?: string;
-  collegeEmailDomain?: string;
 }
 
 const environments = new Set<AppEnvironment>([
@@ -71,31 +68,42 @@ export function parseServerEnvironment(
     (!appOrigin || !appOrigin.startsWith("https://"))
   )
     throw new Error("Production APP_ORIGIN must use HTTPS");
+  const objectStorageEndpoint = source.OBJECT_STORAGE_ENDPOINT?.trim();
+  const objectStorageAccessKey = source.OBJECT_STORAGE_ACCESS_KEY?.trim();
+  const objectStorageSecretKey = source.OBJECT_STORAGE_SECRET_KEY?.trim();
+  const objectStorageValues = [
+    objectStorageEndpoint,
+    objectStorageAccessKey,
+    objectStorageSecretKey,
+  ];
+  if (
+    objectStorageValues.some(Boolean) &&
+    !objectStorageValues.every(Boolean)
+  ) {
+    throw new Error("Object storage configuration must be complete");
+  }
   return {
     appEnv: appEnv as AppEnvironment,
     databaseUrl: validUrl(required(source, "DATABASE_URL"), "DATABASE_URL", [
       "postgres:",
       "postgresql:",
     ]),
-    objectStorageEndpoint: validUrl(
-      required(source, "OBJECT_STORAGE_ENDPOINT"),
-      "OBJECT_STORAGE_ENDPOINT",
-      ["http:", "https:"],
-    ),
-    objectStorageAccessKey: required(source, "OBJECT_STORAGE_ACCESS_KEY"),
-    objectStorageSecretKey: required(source, "OBJECT_STORAGE_SECRET_KEY"),
+    objectStorageEndpoint: objectStorageEndpoint
+      ? validUrl(objectStorageEndpoint, "OBJECT_STORAGE_ENDPOINT", [
+          "http:",
+          "https:",
+        ])
+      : undefined,
+    objectStorageAccessKey,
+    objectStorageSecretKey,
     smtpUrl: validUrl(required(source, "SMTP_URL"), "SMTP_URL", [
       "smtp:",
       "smtps:",
     ]),
+    emailFrom: required(source, "EMAIL_FROM"),
     appVersion: source.APP_VERSION?.trim() || "0.1.0-dev",
     buildCommit: source.BUILD_COMMIT?.trim() || "local",
     appOrigin: appOrigin || undefined,
-    oidcIssuer: source.OIDC_ISSUER?.trim() || undefined,
-    oidcClientId: source.OIDC_CLIENT_ID?.trim() || undefined,
-    oidcClientSecret: source.OIDC_CLIENT_SECRET?.trim() || undefined,
-    collegeEmailDomain:
-      source.COLLEGE_EMAIL_DOMAIN?.trim().toLowerCase() || undefined,
   };
 }
 

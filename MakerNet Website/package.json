@@ -19,7 +19,7 @@
     "lint": "npm run lint -w @makernet/web && npm run lint -w @makernet/worker && npm run lint -w @makernet/db && node --check scripts/run-e2e.mjs && node --check scripts/prepare-standalone.mjs && node --check scripts/create-staging-env.mjs && node --check scripts/verify-staging.mjs",
     "typecheck": "npm run typecheck -w @makernet/web && npm run typecheck -w @makernet/worker",
     "test": "vitest run",
-    "test:db": "vitest run --config vitest.db.config.ts",
+    "test:db": "node --env-file-if-exists=apps/web/.env.local node_modules/vitest/vitest.mjs run --config vitest.db.config.ts",
     "test:e2e": "node scripts/run-e2e.mjs",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
