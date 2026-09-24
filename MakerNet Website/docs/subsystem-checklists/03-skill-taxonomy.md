@@ -12,8 +12,12 @@
 - [x] Taxonomy browser, detail route, and keyboard usable picker operate at desktop and phone widths.
 - [x] Database tests cover deterministic resolution, collisions, inactive entries, cycles, and mutation permissions.
 - [x] Picker is integrated with the guide and profile forms without adding search delivery.
-- [ ] Hosted CI, local staging acceptance from an exact candidate commit, merge, and annotated release tag.
+- [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
+- [x] Clean candidate `bffedef` builds in isolated local Docker staging and passes migration and readiness checks.
+- [ ] Merge and annotated release tag after identity and live runtime gates close.
 
 ## Verification and deviations
 
 The seeded taxonomy is checked through the database tests and browser scans. Skill records created by tests are deactivated on cleanup. No public member or guide data is exposed through the taxonomy route. The user directed later subsystem work before this release gate closes.
+
+Screenshots: [desktop](../screenshots/skills-desktop.png), [phone](../screenshots/skills-mobile.png).

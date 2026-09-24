@@ -15,7 +15,9 @@
 - [x] Database tests cover identity continuity, session lifecycle, departure, officer limits, and privilege removal; browser tests cover local sign-in and protected routes.
 - [ ] Register the real college OIDC application and run the provider sign-in and role matrix with college IT supplied claims.
 - [ ] Live Vercel database readiness and manual screen-reader smoke test.
-- [ ] Hosted CI, staging acceptance from exact candidate commit, merge, and annotated release tag.
+- [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
+- [x] Clean candidate `bffedef` builds in isolated local Docker staging and passes migrations, health, readiness, and desktop/mobile smoke checks.
+- [ ] Live college SSO and Vercel runtime acceptance, merge, and annotated release tag.
 
 ## Verification and deviations
 

@@ -12,8 +12,12 @@
 - [x] Empty, unavailable, and pseudonymous responses avoid disclosing restricted fields.
 - [x] Projection is purged on account departure, profile deactivation, membership loss, and explicit eligibility expiry update; reactivation rebuilds it.
 - [x] Database tests compare owner, organization member, college outsider, and anonymous responses and projected rows.
-- [ ] College SSO and production database integration, hosted CI, staging acceptance, merge, and annotated release tag.
+- [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
+- [x] Clean candidate `bffedef` builds in isolated local Docker staging; local desktop/mobile profile browser checks pass.
+- [ ] College SSO and production database integration, merge, and annotated release tag.
 
 ## Verification and deviations
 
 Profiles remain college-only. The anonymous preview returns no profile. Runtime read paths check expiry even if the wall clock passes a previously set eligibility date; the future search subsystem must also filter current eligibility when reading its projection. No background search delivery is implemented in this milestone.
+
+Screenshots: [desktop](../screenshots/profile-desktop.png), [phone](../screenshots/profile-mobile.png).

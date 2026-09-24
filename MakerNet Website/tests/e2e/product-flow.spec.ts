@@ -142,3 +142,90 @@ test("profile privacy and guide publication work on desktop and phone", async ({
   await expect(page.getByText("Revision 1: Fold a paper sample")).toBeVisible();
   await secondContext.close();
 });
+
+test("a collaborator consents to credit and evidence before a guide reaches their profile", async ({
+  page,
+  browser,
+}) => {
+  test.setTimeout(60_000);
+  const contributorName = handle("contributor");
+  const ownerName = handle("guideowner");
+  const contributorContext = await browser.newContext();
+  try {
+    const contributor = await contributorContext.newPage();
+    await signIn(contributor, contributorName, "/guides");
+    await signIn(page, ownerName, "/guides");
+    await page.goto("/guides/new");
+    await page.getByRole("button", { name: "Create draft" }).click();
+    await page
+      .getByRole("textbox", { name: "Title" })
+      .fill("Inspect a printed fitting");
+    await page
+      .getByRole("textbox", { name: "Goal" })
+      .fill("Record whether the model fits");
+    await page
+      .getByRole("textbox", { name: "Steps" })
+      .fill("Inspect the finished model\nRecord the fit");
+    await page
+      .getByRole("combobox", { name: "Risk declaration" })
+      .selectOption("no_hazards");
+    await page
+      .getByRole("listbox", { name: "Skills used or taught" })
+      .selectOption("00000000-0000-4000-8000-000000000004");
+    await page.getByRole("button", { name: "Save draft" }).click();
+    const draftUrl = page.url();
+    await page
+      .getByRole("textbox", { name: "College email" })
+      .fill(`${contributorName}@local.makernet.invalid`);
+    await page
+      .getByRole("textbox", { name: "Contribution note" })
+      .fill("Checked the sample fit");
+    await page.getByRole("button", { name: "Invite contributor" }).click();
+    await page.getByRole("button", { name: "Publish revision" }).click();
+    await expect(page.locator(".alert.error")).toContainText(
+      "could not be completed",
+    );
+
+    await contributor.goto("/guides");
+    await contributor
+      .getByRole("link", { name: "Respond to invitation" })
+      .click();
+    await contributor.getByRole("button", { name: "Accept credit" }).click();
+    await expect(contributor.getByRole("status")).toContainText(
+      "response was saved",
+    );
+
+    await page.goto(draftUrl);
+    const contributorRow = page
+      .locator(".record-list li")
+      .filter({ hasText: contributorName });
+    await contributorRow
+      .getByRole("button", { name: "Propose evidence" })
+      .click();
+    await contributor.goto("/guides");
+    await contributor
+      .getByRole("link", { name: "Respond to invitation" })
+      .click();
+    await expect(contributor.getByText("3D printing")).toBeVisible();
+    await contributor.getByRole("button", { name: "Accept evidence" }).click();
+    await expect(contributor.getByRole("status")).toContainText(
+      "response was saved",
+    );
+
+    await page.goto(draftUrl);
+    await page.getByRole("button", { name: "Publish revision" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Inspect a printed fitting" }),
+    ).toBeVisible();
+    await contributor.goto("/members/me");
+    await expect(
+      contributor.getByRole("heading", { name: "Accepted guide evidence" }),
+    ).toBeVisible();
+    await expect(
+      contributor.getByRole("link", { name: "Inspect a printed fitting" }),
+    ).toBeVisible();
+    await checkPage(contributor);
+  } finally {
+    await contributorContext.close();
+  }
+});
