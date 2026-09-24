@@ -9,6 +9,11 @@ export interface ServerEnvironment {
   smtpUrl: string;
   appVersion: string;
   buildCommit: string;
+  appOrigin?: string;
+  oidcIssuer?: string;
+  oidcClientId?: string;
+  oidcClientSecret?: string;
+  collegeEmailDomain?: string;
 }
 
 const environments = new Set<AppEnvironment>([
@@ -46,6 +51,26 @@ export function parseServerEnvironment(
   if (!environments.has(appEnv as AppEnvironment)) {
     throw new Error("Invalid configuration: APP_ENV");
   }
+  const appOrigin = source.APP_ORIGIN?.trim();
+  if (appOrigin) {
+    const parsed = new URL(
+      validUrl(appOrigin, "APP_ORIGIN", ["http:", "https:"]),
+    );
+    if (
+      parsed.origin !== appOrigin ||
+      parsed.pathname !== "/" ||
+      parsed.search ||
+      parsed.hash
+    )
+      throw new Error(
+        "APP_ORIGIN must be an origin without a path or trailing slash",
+      );
+  }
+  if (
+    appEnv === "production" &&
+    (!appOrigin || !appOrigin.startsWith("https://"))
+  )
+    throw new Error("Production APP_ORIGIN must use HTTPS");
   return {
     appEnv: appEnv as AppEnvironment,
     databaseUrl: validUrl(required(source, "DATABASE_URL"), "DATABASE_URL", [
@@ -65,6 +90,12 @@ export function parseServerEnvironment(
     ]),
     appVersion: source.APP_VERSION?.trim() || "0.1.0-dev",
     buildCommit: source.BUILD_COMMIT?.trim() || "local",
+    appOrigin: appOrigin || undefined,
+    oidcIssuer: source.OIDC_ISSUER?.trim() || undefined,
+    oidcClientId: source.OIDC_CLIENT_ID?.trim() || undefined,
+    oidcClientSecret: source.OIDC_CLIENT_SECRET?.trim() || undefined,
+    collegeEmailDomain:
+      source.COLLEGE_EMAIL_DOMAIN?.trim().toLowerCase() || undefined,
   };
 }
 

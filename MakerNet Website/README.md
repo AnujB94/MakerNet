@@ -1,6 +1,6 @@
 # MakerNet
 
-MakerNet connects campus makers, skills, and practical guides. This folder contains the website workspace. The repository is following [the website execution plan](../MakerNet-Website-Execution-Plan.md) in subsystem order. Subsystem 0 is in verification; product workflows have not been implemented.
+MakerNet connects campus makers, skills, and practical guides. This folder contains the website workspace. The repository follows [the website execution plan](../MakerNet-Website-Execution-Plan.md). Subsystems 0 and 1 are tagged. Subsystems 2–5 have local implementations pending college SSO, production database integration, and release acceptance.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ npm.cmd run db:verify
 npm.cmd run dev
 ```
 
-Open `http://127.0.0.1:3000`. `/api/health` reports liveness, version, and commit; `/api/ready` checks Postgres. Local object storage is at `http://127.0.0.1:9001` and captured email is at `http://127.0.0.1:8025`.
+Open `http://127.0.0.1:3000`. Local sign-in is available only from loopback in `APP_ENV=local` or `test`. `/api/health` reports liveness, version, and commit; `/api/ready` checks Postgres. Local object storage is at `http://127.0.0.1:9001` and captured email is at `http://127.0.0.1:8025`.
 
 ## Verification
 
@@ -29,11 +29,12 @@ npm.cmd run typecheck
 npm.cmd test
 npm.cmd run db:check
 npm.cmd run db:verify
+npm.cmd run test:db
 npm.cmd run build
 npm.cmd run test:e2e
 ```
 
-`db:verify` needs Postgres. The other checks can run without Docker. See [local setup and recovery](docs/runbooks/local-setup.md), [staging deployment](docs/runbooks/staging-deployment.md), and the [Subsystem 0 checklist](docs/subsystem-checklists/00-foundation.md).
+`db:verify` and `test:db` need Postgres and the variables in `.env.example` exported to the shell. The other checks can run without Docker. See [local setup and recovery](docs/runbooks/local-setup.md), [staging deployment](docs/runbooks/staging-deployment.md), and the [subsystem checklists](docs/subsystem-checklists/02-identity-and-access.md).
 
 The browser command starts the production standalone build on a free port. Run `npm.cmd run build` first. It loads `apps/web/.env.local` for local verification or uses environment variables supplied by CI.
 
@@ -43,4 +44,4 @@ From a clean checkout, run `npm.cmd run staging:env`, then `docker compose --env
 
 ## Module ownership
 
-`apps/web` serves pages and routes. `apps/worker` is reserved for durable background jobs. `packages/db` owns migrations. UI, contracts, and shared configuration packages are reserved for the first subsystems that need them. Product modules must enforce their own service policies; pages compose them through typed boundaries.
+`apps/web` serves pages and routes. `apps/worker` is reserved for durable background jobs. `packages/db` owns migrations. Identity, skills, profiles, and guides live in `apps/web/src/modules`. Product modules enforce service policies; pages compose them through typed boundaries. The outbox stores events for later delivery, but no notification or search worker is active yet.

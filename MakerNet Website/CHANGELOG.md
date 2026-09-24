@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased — Subsystems 2–5 candidate
+
+- Added college OIDC adapter, local-only development sign-in, account/session lifecycle, scoped roles, and audit views.
+- Added canonical skill taxonomy, reviewed aliases, moderator operations, browser and picker.
+- Added member profiles, field privacy, self-declared skills, audience preview, export preparation, and projection guards.
+- Added text-only collaborative guides, revision history, accepted attribution, evidence consent, visibility changes, and stewardship transfer.
+- Added migrations `0002`–`0009`, database integration tests, desktop/mobile browser coverage, and CI database testing. Production SSO, PostgreSQL, and release acceptance remain pending.
+
+## 0.2.0 - 2026-09-24
+
+- Merged pull request #6 for the industrial editorial design system and application shell; tagged `v0.2.0` at `10d2909`.
+- Desktop/mobile automated accessibility and local staging checks passed. Manual screen-reader review and Vercel dynamic-route readiness remain open.
+
 ## 0.1.0 - 2026-09-24
 
 - Started Subsystem 0 repository and delivery foundation.

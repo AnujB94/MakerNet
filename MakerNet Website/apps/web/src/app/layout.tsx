@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteNavigation } from "@/components/site-navigation";
+import { AccountMenu } from "@/components/account-menu";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,9 +24,7 @@ export default function RootLayout({
               Maker<span className="brand-mark">Net</span>
             </Link>
             <SiteNavigation />
-            <div className="account-location" aria-label="Account area">
-              Visitor
-            </div>
+            <AccountMenu />
           </div>
         </header>
         <main className="site-main" id="main-content" tabIndex={-1}>

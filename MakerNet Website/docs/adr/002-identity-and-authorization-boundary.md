@@ -1,6 +1,6 @@
 # ADR 002 Identity and authorization boundary
 
-- **Status:** Accepted for interface design; implementation begins in Subsystem 2
+- **Status:** Implemented locally; college provider integration pending
 - **Date:** 2026-09-24
 - **Subsystem:** 0 Repository and Delivery Foundation
 
