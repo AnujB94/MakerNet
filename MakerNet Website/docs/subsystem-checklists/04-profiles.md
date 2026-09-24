@@ -1,7 +1,7 @@
 # Subsystem 4: Profiles and self-declared skills
 
-- **Status:** Local implementation and verification complete; release acceptance pending.
-- **Branch:** `feat/identity-access`
+- **Status:** Implementation merged to `main`; production acceptance and release tag pending.
+- **Merged:** Pull request #7 at `dc0f469`
 - **Target tag:** `v0.5.0` (not created)
 
 ## Acceptance criteria and implementation
