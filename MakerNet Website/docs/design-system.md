@@ -45,11 +45,23 @@ an exception before introducing a new one.
 
 ## Shell
 
-The shared shell includes the MakerNet wordmark, primary navigation for routes
-that actually exist, a reserved account area labelled Visitor, a skip link,
-responsive content width, and a footer. Subsystem 2 replaces the visitor area
-with authenticated account controls. The home route displays foundation
-version, commit, and a link to the existing health endpoint.
+The shared shell includes the MakerNet wordmark, policy-aware navigation, a
+visitor or account menu, a skip link, responsive content width, and a footer.
+The home route surfaces live skills, profiles, and guides only when the database
+is ready; visitor links lead to sign-in and the design-system workbench.
+
+## Product screen patterns added in Subsystems 2–5
+
+The taxonomy browser reuses record lists and a labeled native select picker.
+Profile edit/privacy uses the settings template, explicit audience labels, and
+read-only preview; unavailable fields are omitted at the service layer. Guide
+creation and revision editing use the editor template with separate content,
+skill, risk, and contributor sections. Guide detail and revision history reuse
+the detail/list templates. Management and moderation screens use the moderation
+template with status, scope, consent, and action groups. Forms use native
+controls with visible labels and inline error/status feedback. Scope-restricted
+actions are absent from the rendered management page and independently checked
+by the service. The account menu uses the existing disclosure pattern.
 
 ## Review
 

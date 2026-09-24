@@ -32,4 +32,30 @@ describe("server configuration", () => {
     expect(env.appVersion).toBe("0.1.0-dev");
     expect(env.buildCommit).toBe("local");
   });
+
+  it("requires a canonical HTTPS origin for production cookies and callbacks", () => {
+    expect(() =>
+      parseServerEnvironment({ ...complete, APP_ENV: "production" }),
+    ).toThrow(/Production APP_ORIGIN/);
+    expect(() =>
+      parseServerEnvironment({
+        ...complete,
+        APP_ENV: "production",
+        APP_ORIGIN: "http://example.test",
+      }),
+    ).toThrow(/Production APP_ORIGIN/);
+    expect(() =>
+      parseServerEnvironment({
+        ...complete,
+        APP_ORIGIN: "https://example.test/path",
+      }),
+    ).toThrow(/APP_ORIGIN must be an origin/);
+    expect(
+      parseServerEnvironment({
+        ...complete,
+        APP_ENV: "production",
+        APP_ORIGIN: "https://example.test",
+      }).appOrigin,
+    ).toBe("https://example.test");
+  });
 });

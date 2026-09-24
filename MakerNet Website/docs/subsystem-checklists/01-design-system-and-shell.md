@@ -1,8 +1,8 @@
 # Subsystem 1 completion checklist
 
-- **Status:** In progress
-- **Branch:** `feat/design-system-shell`
-- **Target release:** `v0.2.0`
+- **Status:** Implementation merged and tagged; external acceptance checks remain open.
+- **Branch:** merged pull request #6
+- **Release tag:** `v0.2.0` at `10d2909`
 
 - [x] Architecture's industrial editorial direction reconciled with the blank foundation app
 - [x] Desktop and phone examples saved in `docs/screenshots`
@@ -18,7 +18,7 @@
 - [x] Hosted CI passes both required jobs on draft pull request #6
 - [x] Protected Vercel preview builds and serves `/design-system`
 - [ ] Configure and verify Vercel production runtime dependencies
-- [ ] Merge and annotate `v0.2.0`
+- [x] Merge and annotate `v0.2.0`
 
 ## Verification
 
@@ -71,3 +71,6 @@
   `apps/web/vercel.json` and `npx next build`; the workspace's Docker-specific
   `postbuild` remains for local staging. Web TypeScript excludes co-located
   Vitest files during that host build while workspace tests still run them.
+- Pull request #6 was later merged and tagged. The manual screen-reader and
+  production runtime checks remain pending; the user directed continued local
+  implementation through Subsystem 5 before those external gates close.

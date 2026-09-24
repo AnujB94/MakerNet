@@ -16,6 +16,18 @@ export function SiteNavigation() {
       >
         Design system
       </Link>
+      <Link
+        href="/skills"
+        aria-current={pathname.startsWith("/skills") ? "page" : undefined}
+      >
+        Skills
+      </Link>
+      <Link
+        href="/guides"
+        aria-current={pathname.startsWith("/guides") ? "page" : undefined}
+      >
+        Guides
+      </Link>
     </nav>
   );
 }
