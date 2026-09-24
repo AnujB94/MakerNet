@@ -2,11 +2,11 @@
 
 ## Unreleased — Subsystems 2–5 candidate
 
-- Added college OIDC adapter, local-only development sign-in, account/session lifecycle, scoped roles, and audit views.
+- Added passwordless email sign-in for any valid email, single-use links, local-only development sign-in, account/session lifecycle, scoped roles, and audit views. College SSO is deferred.
 - Added canonical skill taxonomy, reviewed aliases, moderator operations, browser and picker.
 - Added member profiles, field privacy, self-declared skills, audience preview, export preparation, and projection guards.
 - Added text-only collaborative guides, revision history, accepted attribution, evidence consent, visibility changes, and stewardship transfer.
-- Added migrations `0002`–`0009`, database integration tests, desktop/mobile browser coverage, and CI database testing. Production SSO, PostgreSQL, and release acceptance remain pending.
+- Added migrations `0002`–`0010`, database integration tests, desktop/mobile browser coverage, and CI database testing. Production email delivery, PostgreSQL, deployment, and release acceptance remain pending.
 
 ## 0.2.0 - 2026-09-24
 

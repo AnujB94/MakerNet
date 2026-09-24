@@ -14,10 +14,10 @@
 - [x] Database tests compare owner, organization member, college outsider, and anonymous responses and projected rows.
 - [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
 - [x] Clean candidate `bffedef` builds in isolated local Docker staging; local desktop/mobile profile browser checks pass.
-- [ ] College SSO and production database integration, merge, and annotated release tag.
+- [ ] Production email sign-in and database integration, merge, and annotated release tag.
 
 ## Verification and deviations
 
-Profiles remain college-only. The anonymous preview returns no profile. Runtime read paths check expiry even if the wall clock passes a previously set eligibility date; the future search subsystem must also filter current eligibility when reading its projection. No background search delivery is implemented in this milestone.
+Profiles remain signed-in-only. During the temporary email-identity deviation, any verified email account satisfies the policy's `college` audience label. The anonymous preview returns no profile. Runtime read paths check expiry even if the wall clock passes a previously set eligibility date; the future search subsystem must also filter current eligibility when reading its projection. No background search delivery is implemented in this milestone.
 
 Screenshots: [desktop](../screenshots/profile-desktop.png), [phone](../screenshots/profile-mobile.png).

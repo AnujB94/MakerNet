@@ -7,7 +7,9 @@ import { pool } from "@/modules/db";
 import {
   createOrganization,
   createSession,
+  completeEmailSignIn,
   grantSiteRole,
+  issueEmailSignIn,
   principalForToken,
   revokeSession,
   rotateSession,
@@ -188,5 +190,28 @@ describe("identity database boundary", () => {
     expect(
       (await principalForToken(member.token))?.organizations.has(orgId),
     ).toBe(false);
+  });
+
+  it("uses a short-lived email link once and rate limits repeated requests", async () => {
+    const email = `email-${randomUUID()}@example.test`;
+    const token = await issueEmailSignIn(email, "/members/me");
+    expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);
+    expect(await issueEmailSignIn(email, "/")).toBeNull();
+    const session = await completeEmailSignIn(token!);
+    expect(session.returnTo).toBe("/members/me");
+    expect((await principalForToken(session.token))?.id).toBe(session.personId);
+    const person = await pool().query<{
+      institution_email: string;
+      issuer: string;
+    }>(`SELECT institution_email, issuer FROM makernet.person WHERE id = $1`, [
+      session.personId,
+    ]);
+    expect(person.rows[0]).toEqual({
+      institution_email: email,
+      issuer: "urn:makernet:verified-email",
+    });
+    await expect(completeEmailSignIn(token!)).rejects.toThrow(
+      /expired or already used/,
+    );
   });
 });

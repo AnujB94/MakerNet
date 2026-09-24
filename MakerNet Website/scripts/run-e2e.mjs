@@ -14,14 +14,7 @@ try {
 } catch (error) {
   if (error.code !== "ENOENT") throw error;
 }
-const required = [
-  "APP_ENV",
-  "DATABASE_URL",
-  "OBJECT_STORAGE_ENDPOINT",
-  "OBJECT_STORAGE_ACCESS_KEY",
-  "OBJECT_STORAGE_SECRET_KEY",
-  "SMTP_URL",
-];
+const required = ["APP_ENV", "DATABASE_URL", "SMTP_URL", "EMAIL_FROM"];
 const missing = required.filter((name) => !process.env[name]);
 if (missing.length) {
   throw new Error(
