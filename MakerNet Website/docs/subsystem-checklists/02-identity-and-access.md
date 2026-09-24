@@ -1,7 +1,7 @@
 # Subsystem 2: Identity and access control
 
-- **Status:** Local implementation and verification complete; release acceptance pending.
-- **Branch:** `feat/identity-access`
+- **Status:** Implementation merged to `main`; production acceptance and release tag pending.
+- **Merged:** Pull requests #7 and #8; current implementation at `d5a896d`
 - **Target tag:** `v0.3.0` (not created)
 
 ## Acceptance criteria and implementation
