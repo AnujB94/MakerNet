@@ -16,7 +16,7 @@
 - [x] Desktop and phone browser tests request a captured email, follow its sign-in link, reach a protected route, and reject link replay.
 - [ ] Configure production SMTP and run live delivery, replay, account-state, and role-matrix acceptance.
 - [ ] Live Vercel database readiness and manual screen-reader smoke test.
-- [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
+- [x] GitHub `verify` and `secrets` checks passed on merged pull request #7; the passwordless-email follow-up is implementation commit `26ba026`.
 - [x] Clean candidate `bffedef` builds in isolated local Docker staging and passes migrations, health, readiness, and desktop/mobile smoke checks.
 - [ ] Live email sign-in and Vercel runtime acceptance, merge, and annotated release tag.
 
