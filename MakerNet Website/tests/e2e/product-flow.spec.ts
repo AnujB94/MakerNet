@@ -29,6 +29,50 @@ async function checkPage(page: import("@playwright/test").Page) {
   expect(scan.violations).toEqual([]);
 }
 
+async function waitForSignInLink(email: string) {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    const inbox = (await fetch("http://127.0.0.1:8025/api/v1/messages").then(
+      (response) => response.json(),
+    )) as {
+      messages: { ID: string; To: { Address: string }[] }[];
+    };
+    const summary = inbox.messages.find((message) =>
+      message.To.some((recipient) => recipient.Address === email),
+    );
+    if (summary) {
+      const message = await fetch(
+        `http://127.0.0.1:8025/api/v1/message/${summary.ID}`,
+      ).then((response) => response.text());
+      const match = message.match(
+        /http:\/\/127\.0\.0\.1:\d+\/auth\/email\/verify\?token=[A-Za-z0-9_-]{43}/,
+      );
+      if (match) return match[0];
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error(`No sign-in email arrived for ${email}`);
+}
+
+test("a valid email receives a single-use sign-in link", async ({ page }) => {
+  const email = `${handle("email")}@example.test`;
+  await page.goto("/sign-in?returnTo=/settings");
+  await page.getByRole("textbox", { name: "Email address" }).fill(email);
+  await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+  await expect(page.getByRole("status")).toContainText("Check your inbox");
+  const link = await waitForSignInLink(email);
+  await page.goto(link);
+  await expect(page).toHaveURL(/\/settings$/);
+  await expect(
+    page.getByRole("heading", { name: "Your account" }),
+  ).toBeVisible();
+  await page.goto(link);
+  await expect(page).toHaveURL(/\/sign-in\?error=expired/);
+  await expect(page.locator(".alert.warning")).toContainText(
+    "expired or was already used",
+  );
+});
+
 test("identity session, restricted admin route, and skill browser", async ({
   page,
 }, testInfo) => {

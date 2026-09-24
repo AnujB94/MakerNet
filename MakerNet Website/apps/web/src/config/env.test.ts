@@ -8,6 +8,7 @@ const complete = {
   OBJECT_STORAGE_ACCESS_KEY: "access",
   OBJECT_STORAGE_SECRET_KEY: "secret",
   SMTP_URL: "smtp://localhost:1025",
+  EMAIL_FROM: "MakerNet <noreply@makernet.local>",
 };
 
 describe("server configuration", () => {
@@ -31,6 +32,24 @@ describe("server configuration", () => {
     expect(env.appEnv).toBe("test");
     expect(env.appVersion).toBe("0.1.0-dev");
     expect(env.buildCommit).toBe("local");
+  });
+
+  it("allows unused object storage to be omitted but rejects partial settings", () => {
+    const withoutStorage = {
+      ...complete,
+      OBJECT_STORAGE_ENDPOINT: undefined,
+      OBJECT_STORAGE_ACCESS_KEY: undefined,
+      OBJECT_STORAGE_SECRET_KEY: undefined,
+    };
+    expect(parseServerEnvironment(withoutStorage).objectStorageEndpoint).toBe(
+      undefined,
+    );
+    expect(() =>
+      parseServerEnvironment({
+        ...withoutStorage,
+        OBJECT_STORAGE_ENDPOINT: "https://storage.example.test",
+      }),
+    ).toThrow("Object storage configuration must be complete");
   });
 
   it("requires a canonical HTTPS origin for production cookies and callbacks", () => {

@@ -105,16 +105,16 @@ export async function principalForToken(
   return isEligible(principal) ? principal : null;
 }
 
-export async function createSession(
+async function createSessionRecord(
+  db: DatabaseClient,
   claims: IdentityClaims,
 ): Promise<{ token: string; personId: string }> {
   if (!claims.issuer || !claims.subject || !claims.email || !claims.displayName)
     throw new Error("Incomplete identity claims");
   const token = newToken();
-  return transaction(async (db) => {
-    const person = await one<PersonRow>(
-      db,
-      `
+  const person = await one<PersonRow>(
+    db,
+    `
       INSERT INTO makernet.person(issuer, provider_subject, institution_email, display_name, eligibility_ends_at)
       VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (issuer, provider_subject) DO UPDATE
@@ -123,33 +123,102 @@ export async function createSession(
           eligibility_ends_at = EXCLUDED.eligibility_ends_at,
           updated_at = now()
       RETURNING id, state, eligibility_ends_at`,
-      [
-        claims.issuer,
-        claims.subject,
-        claims.email,
-        claims.displayName,
-        claims.eligibilityEndsAt ?? null,
-      ],
-    );
-    if (!person) throw new Error("Unable to create account");
-    const principal = await loadPrincipal(db, person);
-    if (!isEligible(principal)) throw new Error("Account is not eligible");
-    await db.query(
-      `
+    [
+      claims.issuer,
+      claims.subject,
+      claims.email,
+      claims.displayName,
+      claims.eligibilityEndsAt ?? null,
+    ],
+  );
+  if (!person) throw new Error("Unable to create account");
+  const principal = await loadPrincipal(db, person);
+  if (!isEligible(principal)) throw new Error("Account is not eligible");
+  await db.query(
+    `
       INSERT INTO makernet.session(person_id, token_hash, expires_at, absolute_expires_at)
       VALUES ($1, $2, now() + interval '7 days', now() + interval '30 days')`,
-      [person.id, hashToken(token)],
+    [person.id, hashToken(token)],
+  );
+  await audit(
+    db,
+    person.id,
+    "sign_in",
+    "person",
+    person.id,
+    "college",
+    "Verified identity accepted",
+  );
+  return { token, personId: person.id };
+}
+
+export async function createSession(
+  claims: IdentityClaims,
+): Promise<{ token: string; personId: string }> {
+  return transaction((db) => createSessionRecord(db, claims));
+}
+
+export async function issueEmailSignIn(
+  email: string,
+  returnTo: string,
+): Promise<string | null> {
+  const token = newToken();
+  return transaction(async (db) => {
+    await db.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [email]);
+    await db.query(
+      `DELETE FROM makernet.email_sign_in_token
+       WHERE expires_at < now() - interval '1 day'`,
     );
-    await audit(
+    const recent = await one<{ minute_count: string; hour_count: string }>(
       db,
-      person.id,
-      "sign_in",
-      "person",
-      person.id,
-      "college",
-      "Provider identity accepted",
+      `SELECT
+        count(*) FILTER (WHERE created_at > now() - interval '1 minute') AS minute_count,
+        count(*) FILTER (WHERE created_at > now() - interval '1 hour') AS hour_count
+       FROM makernet.email_sign_in_token WHERE email = $1`,
+      [email],
     );
-    return { token, personId: person.id };
+    if (Number(recent?.minute_count) >= 1 || Number(recent?.hour_count) >= 5)
+      return null;
+    await db.query(
+      `INSERT INTO makernet.email_sign_in_token
+       (token_hash, email, return_to, expires_at)
+       VALUES ($1, $2, $3, now() + interval '15 minutes')`,
+      [hashToken(token), email, returnTo],
+    );
+    return token;
+  });
+}
+
+export async function invalidateEmailSignIn(token: string): Promise<void> {
+  await pool().query(
+    `UPDATE makernet.email_sign_in_token SET consumed_at = now()
+     WHERE token_hash = $1 AND consumed_at IS NULL`,
+    [hashToken(token)],
+  );
+}
+
+export async function completeEmailSignIn(
+  token: string,
+): Promise<{ token: string; personId: string; returnTo: string }> {
+  if (!/^[A-Za-z0-9_-]{43}$/.test(token))
+    throw new Error("Invalid sign-in token");
+  return transaction(async (db) => {
+    const request = await one<{ email: string; return_to: string }>(
+      db,
+      `UPDATE makernet.email_sign_in_token SET consumed_at = now()
+       WHERE token_hash = $1 AND consumed_at IS NULL AND expires_at > now()
+       RETURNING email, return_to`,
+      [hashToken(token)],
+    );
+    if (!request) throw new Error("Sign-in link expired or already used");
+    const local = request.email.slice(0, request.email.indexOf("@"));
+    const session = await createSessionRecord(db, {
+      issuer: "urn:makernet:verified-email",
+      subject: request.email,
+      email: request.email,
+      displayName: local.slice(0, 100),
+    });
+    return { ...session, returnTo: request.return_to };
   });
 }
 

@@ -10,7 +10,7 @@ College identity data and content visibility affect every later subsystem. The p
 
 ## Decision
 
-Create an identity-provider adapter interface in Subsystem 2 with local development and college OIDC or SAML implementations. Key accounts by issuer plus provider subject. Normalize an allowlisted identity profile, then let a central policy service decide access from account state, audience type and organization scope, accepted attribution audience, content state, and resource relationships. Routes and UI call module services that enforce this policy; hidden controls do not count as authorization.
+Create an identity-provider adapter interface in Subsystem 2 with local development and production implementations. Key accounts by issuer plus provider subject. Normalize an allowlisted identity profile, then let a central policy service decide access from account state, audience type and organization scope, accepted attribution audience, content state, and resource relationships. Routes and UI call module services that enforce this policy; hidden controls do not count as authorization. ADR 003 records the user-directed temporary passwordless-email production adapter while college OIDC or SAML is deferred.
 
 Foundation configuration validates the URLs and credentials needed to start, without exposing them through health or logs. The implementation will not invent college SSO claims or privilege mappings before integration details are available.
 

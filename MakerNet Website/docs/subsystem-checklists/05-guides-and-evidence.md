@@ -17,10 +17,10 @@
 - [x] GitHub `verify` and `secrets` checks pass on draft pull request #7.
 - [x] Clean candidate `bffedef` builds in isolated local Docker staging; local desktop/mobile guide browser checks pass.
 - [x] Browser tests cover contributor invitation, consent, evidence acceptance, publication, and the resulting profile evidence on desktop and phone.
-- [ ] College SSO and production database integration, merge, and annotated release tag.
+- [ ] Production email sign-in and database integration, merge, and annotated release tag.
 
 ## Verification and deviations
 
-Guides are text-only and college-only. Public publication and hazardous guide publication are blocked until the later safety subsystem. Older revisions keep their original audience when a guide's audience widens; a new revision uses the new audience. Object storage, notifications, search indexing, and moderation queues are outside this milestone. The outbox event is persisted but later worker delivery is not claimed.
+Guides are text-only and signed-in-only. During the temporary email-identity deviation, any verified email account satisfies the policy's `college` audience label. Public publication and hazardous guide publication are blocked until the later safety subsystem. Older revisions keep their original audience when a guide's audience widens; a new revision uses the new audience. Object storage, notifications, search indexing, and moderation queues are outside this milestone. The outbox event is persisted but later worker delivery is not claimed.
 
 Screenshots: [desktop](../screenshots/guide-desktop.png), [phone](../screenshots/guide-mobile.png). Final local browser suite: 14 passed across desktop and phone, including the complete contributor-to-profile flow.

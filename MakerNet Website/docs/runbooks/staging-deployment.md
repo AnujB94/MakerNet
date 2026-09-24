@@ -1,6 +1,6 @@
 # Staging deployment contract
 
-**Status:** Local Docker staging is the agreed target for local candidate verification. Production Vercel acceptance awaits college SSO and PostgreSQL credentials.
+**Status:** Local Docker staging is the agreed target for local candidate verification. Production Vercel acceptance awaits PostgreSQL and SMTP configuration.
 
 The staging host must run the image built from `MakerNet Website/infra/staging/Dockerfile`, using `MakerNet Website` as the build context, with production-like environment variables and a reachable Postgres database. Local Docker staging reads generated credentials from an ignored environment file; no credentials belong in the repository or image.
 
@@ -16,4 +16,4 @@ Deployment order:
 
 For local Docker staging, use a clean checkout of the candidate commit. From its `MakerNet Website` folder, run `npm run staging:env`, then `docker compose --env-file infra/staging/.env.staging.local -f infra/staging/compose.yaml up -d --build --wait`. The generated environment file is ignored by Git and contains random local credentials. Run `npm run staging:verify` to probe health, readiness, version, and commit six times over 50 seconds. The web endpoint is `http://127.0.0.1:3001` on the host. Record the candidate commit and probe result in the foundation checklist.
 
-Subsystems 2–5 add migrations `0002`–`0009`. Rehearse them both on an empty database and on a copy of the preceding release schema. The web image must receive `APP_ORIGIN` matching the externally used origin, and production OIDC settings must point to the registered college client. Local development identity is unavailable in staging. After deployment, verify college sign-in, callback, logout, session expiry, role scoping, profile field audiences, and guide attribution/evidence with test college accounts. A healthy `/api/ready` proves database connectivity only; it does not prove the OIDC integration.
+Subsystems 2–5 add migrations `0002`–`0010`. Rehearse them both on an empty database and on a copy of the preceding release schema. The web image must receive `APP_ORIGIN` matching the externally used origin plus working `SMTP_URL` and `EMAIL_FROM` settings. The local development identity is unavailable in staging. After deployment, verify email request, link delivery, single-use verification, logout, session expiry, role scoping, profile field audiences, and guide attribution/evidence with test accounts. A healthy `/api/ready` proves database connectivity only; it does not prove email delivery.

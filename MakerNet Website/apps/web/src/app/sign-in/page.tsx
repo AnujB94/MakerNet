@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function SignInPage({
   searchParams,
 }: {
-  searchParams: Promise<{ returnTo?: string; error?: string }>;
+  searchParams: Promise<{ returnTo?: string; error?: string; sent?: string }>;
 }) {
   const query = await searchParams;
   const returnTo = safeReturnTo(query.returnTo ?? "/");
@@ -18,22 +18,48 @@ export default async function SignInPage({
       <p className="eyebrow">MakerNet / Identity</p>
       <h1>Sign in to the workshop</h1>
       <p>
-        Use your college identity to publish, contribute, and manage your
-        profile.
+        Enter your email. We will send a private, one-time link that signs you
+        in without a password.
       </p>
-      {query.error && (
-        <p className="alert error" role="alert">
-          Sign-in could not be completed. Check your account or try again.
+      {query.sent && (
+        <p className="alert success" role="status">
+          Check your inbox. If the address can receive mail, its sign-in link
+          will arrive shortly and expire after 15 minutes.
         </p>
       )}
-      {env.oidcIssuer && (
-        <a
-          className="button-link button-primary"
-          href={`/auth/start?returnTo=${encodeURIComponent(returnTo)}`}
-        >
-          Continue with college SSO
-        </a>
+      {query.error === "invalid" && (
+        <p className="alert error" role="alert">
+          Enter a complete email address, such as name@example.com.
+        </p>
       )}
+      {query.error === "delivery" && (
+        <p className="alert error" role="alert">
+          MakerNet could not send the email. Try again in a moment.
+        </p>
+      )}
+      {query.error === "expired" && (
+        <p className="alert warning" role="alert">
+          That link expired or was already used. Request a new one below.
+        </p>
+      )}
+      <form className="form-stack" action="/auth/email/request" method="post">
+        <input type="hidden" name="returnTo" value={returnTo} />
+        <label className="field">
+          <span className="field-label">Email address</span>
+          <input
+            className="field-control"
+            name="email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            maxLength={254}
+            required
+          />
+        </label>
+        <button className="button button-primary" type="submit">
+          Email me a sign-in link
+        </button>
+      </form>
       {local && (
         <form className="form-stack" action="/auth/local" method="post">
           <h2>Development account</h2>
@@ -57,11 +83,6 @@ export default async function SignInPage({
             Sign in locally
           </button>
         </form>
-      )}
-      {!local && !env.oidcIssuer && (
-        <p className="alert warning">
-          College sign-in is awaiting configuration.
-        </p>
       )}
       <p>
         <Link href="/">Return home</Link>
